@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🎾 TV 중계 스타일 테니스 매치 시뮬레이터</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #0b0f19;
+      color: #f8fafc;
+    }
+    /* 커스텀 스크롤바 */
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #1e293b;
+      border-radius: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #475569;
+      border-radius: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #64748b;
+    }
+  </style>
+</head>
+<body class="min-h-screen p-3 md:p-6 flex flex-col items-center justify-start">
+
+  <!-- 메인 컨테이너 -->
+  <div class="w-full max-w-7xl flex flex-col gap-6">
+
+    <!-- 헤더 섹션 -->
+    <header class="flex flex-col md:flex-row justify-between items-center bg-slate-800/90 backdrop-blur-md p-4 md:p-6 rounded-2xl border border-slate-700/60 shadow-2xl">
+      <div>
+        <h1 class="text-2xl md:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 flex items-center gap-2">
+          <span>🎾</span> TV BROADCAST TENNIS SIMULATOR
+        </h1>
+        <p class="text-xs md:text-sm text-slate-400 mt-1">실시간 물리 랠리 궤적 시각화 & 스탯 기반 경기 시뮬레이션</p>
+      </div>
+
+      <!-- 상단 컨트롤 버튼 -->
+      <div class="flex flex-wrap gap-2 mt-4 md:mt-0">
+        <button id="btn-point" class="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold px-4 py-2.5 rounded-xl shadow-lg transition active:scale-95 disabled:opacity-50 text-sm flex items-center gap-1.5">
+          <span>▶</span> 1포인트 진행
+        </button>
+        <button id="btn-auto" class="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-bold px-4 py-2.5 rounded-xl shadow-lg transition active:scale-95 disabled:opacity-50 text-sm flex items-center gap-1.5">
+          <span id="auto-icon">⏩</span> <span id="auto-text">자동 진행</span>
+        </button>
+        <button id="btn-reset" class="bg-gradient-to-r from-rose-500 to-red-600 hover:from-rose-600 hover:to-red-700 text-white font-bold px-4 py-2.5 rounded-xl shadow-lg transition active:scale-95 text-sm flex items-center gap-1.5">
+          <span>🔄</span> 리셋
+        </button>
+      </div>
+    </header>
+
+    <!-- 듀스 / 브레이크 포인트 / 우승 상태 배너 -->
+    <div id="status-banner" class="hidden w-full py-2.5 px-4 rounded-xl text-center font-black text-sm md:text-base border transition-all duration-300 shadow-md">
+    </div>
+
+    <!-- 그리드 레이아웃: 좌측 설정 및 전광판 | 우측 캔버스 & TV 브로드캐스트 패널 -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+      <!-- 좌측 패널 (스탯 설정, 전광판, 경기 통계, 로그) -->
+      <div class="lg:col-span-5 flex flex-col gap-5">
+        
+        <!-- 코트 테마 변경 패널 -->
+        <div class="bg-slate-800/90 p-4 rounded-2xl border border-slate-700/60 shadow-lg">
+          <h2 class="text-xs uppercase tracking-wider font-extrabold text-slate-400 mb-3 flex items-center justify-between">
+            <span>🏟️ 코트 표면 테마 선택</span>
+            <span class="text-[10px] text-teal-400 font-mono">SURFACE SELECT</span>
+          </h2>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+            <button class="theme-btn active bg-blue-600 text-white p-2 rounded-xl text-xs font-bold border border-blue-400 hover:bg-blue-500 transition" data-theme="us-open">US 하드</button>
+            <button class="theme-btn bg-emerald-700 text-white p-2 rounded-xl text-xs font-bold border border-emerald-500 hover:bg-emerald-600 transition" data-theme="wimbledon">윔블던 잔디</button>
+            <button class="theme-btn bg-amber-700 text-white p-2 rounded-xl text-xs font-bold border border-amber-500 hover:bg-amber-600 transition" data-theme="roland-garros">롤랑가로스</button>
+            <button class="theme-btn bg-teal-600 text-white p-2 rounded-xl text-xs font-bold border border-teal-400 hover:bg-teal-500 transition" data-theme="australian">호주 하드</button>
+          </div>
+        </div>
+
+        <!-- 선수 스탯 설정 패널 -->
+        <div class="bg-slate-800/90 p-4 md:p-5 rounded-2xl border border-slate-700/60 shadow-lg">
+          <div class="flex justify-between items-center mb-3">
+            <h2 class="text-base font-bold text-slate-200 flex items-center gap-2">
+              <span>⚙️</span> 선수 스탯 설정
+            </h2>
+            <button id="btn-apply-stats" class="text-xs bg-slate-700 hover:bg-slate-600 text-emerald-400 font-bold px-3 py-1.5 rounded-lg border border-emerald-500/30 transition">
+              스탯 적용
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 gap-3">
+            <!-- 선수 A -->
+            <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-700/40">
+              <div class="text-xs font-bold text-emerald-400 mb-2 flex items-center justify-between">
+                <span>선수 A (상단 코트)</span>
+                <span class="text-[10px] text-slate-400">공격형 파이터</span>
+              </div>
+              <div class="grid grid-cols-4 gap-2 text-xs">
+                <div>
+                  <label class="block text-slate-400 text-[10px] mb-1">1서브인</label>
+                  <input type="number" id="p1-serve" value="0.65" step="0.01" min="0" max="1" class="w-full bg-slate-800 border border-slate-600 rounded p-1 text-center font-mono focus:outline-none focus:border-emerald-500">
+                </div>
+                <div>
+                  <label class="block text-slate-400 text-[10px] mb-1">에이스</label>
+                  <input type="number" id="p1-ace" value="0.12" step="0.01" min="0" max="1" class="w-full bg-slate-800 border border-slate-600 rounded p-1 text-center font-mono focus:outline-none focus:border-emerald-500">
+                </div>
+                <div>
+                  <label class="block text-slate-400 text-[10px] mb-1">위너</label>
+                  <input type="number" id="p1-winner" value="0.22" step="0.01" min="0" max="1" class="w-full bg-slate-800 border border-slate-600 rounded p-1 text-center font-mono focus:outline-none focus:border-emerald-500">
+                </div>
+                <div>
+                  <label class="block text-slate-400 text-[10px] mb-1">범실</label>
+                  <input type="number" id="p1-error" value="0.16" step="0.01" min="0" max="1" class="w-full bg-slate-800 border border-slate-600 rounded p-1 text-center font-mono focus:outline-none focus:border-emerald-500">
+                </div>
+              </div>
+            </div>
+
+            <!-- 선수 B -->
+            <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-700/40">
+              <div class="text-xs font-bold text-cyan-400 mb-2 flex items-center justify-between">
+                <span>선수 B (하단 코트)</span>
+                <span class="text-[10px] text-slate-400">안정형 수비수</span>
+              </div>
+              <div class="grid grid-cols-4 gap-2 text-xs">
+                <div>
+                  <label class="block text-slate-400 text-[10px] mb-1">1서브인</label>
+                  <input type="number" id="p2-serve" value="0.72" step="0.01" min="0" max="1" class="w-full bg-slate-800 border border-slate-600 rounded p-1 text-center font-mono focus:outline-none focus:border-cyan-500">
+                </div>
+                <div>
+                  <label class="block text-slate-400 text-[10px] mb-1">에이스</label>
+                  <input type="number" id="p2-ace" value="0.07" step="0.01" min="0" max="1" class="w-full bg-slate-800 border border-slate-600 rounded p-1 text-center font-mono focus:outline-none focus:border-cyan-500">
+                </div>
+                <div>
+                  <label class="block text-slate-400 text-[10px] mb-1">위너</label>
+                  <input type="number" id="p2-winner" value="0.15" step="0.01" min="0" max="1" class="w-full bg-slate-800 border border-slate-600 rounded p-1 text-center font-mono focus:outline-none focus:border-cyan-500">
+                </div>
+                <div>
+                  <label class="block text-slate-400 text-[10px] mb-1">범실</label>
+                  <input type="number" id="p2-error" value="0.10" step="0.01" min="0" max="1" class="w-full bg-slate-800 border border-slate-600 rounded p-1 text-center font-mono focus:outline-none focus:border-cyan-500">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TV 전광판 스코어보드 -->
+        <div class="bg-slate-800/90 p-5 rounded-2xl border border-slate-700/60 shadow-lg">
+          <h2 class="text-xs uppercase tracking-wider font-extrabold text-slate-400 mb-3 flex items-center justify-between">
+            <span>LIVE BROADCAST SCOREBOARD</span>
+            <span class="text-[10px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">Best of 3</span>
+          </h2>
+
+          <div class="space-y-3">
+            <div class="flex items-center justify-between bg-slate-900/80 p-3 rounded-xl border border-slate-700/40">
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-slate-100 text-sm md:text-base">선수 A</span>
+                <span id="p1-server-badge" class="hidden bg-amber-500 text-slate-950 font-black text-[10px] px-1.5 py-0.5 rounded shadow">SERVE</span>
+              </div>
+              <div class="flex items-center gap-4">
+                <div id="p1-sets" class="text-xs text-slate-400 font-mono">게임: 0 (세트: 0)</div>
+                <div id="p1-game-score" class="text-xl md:text-2xl font-black font-mono text-emerald-400 w-16 text-right">0</div>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between bg-slate-900/80 p-3 rounded-xl border border-slate-700/40">
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-slate-100 text-sm md:text-base">선수 B</span>
+                <span id="p2-server-badge" class="hidden bg-amber-500 text-slate-950 font-black text-[10px] px-1.5 py-0.5 rounded shadow">SERVE</span>
+              </div>
+              <div class="flex items-center gap-4">
+                <div id="p2-sets" class="text-xs text-slate-400 font-mono">게임: 0 (세트: 0)</div>
+                <div id="p2-game-score" class="text-xl md:text-2xl font-black font-mono text-cyan-400 w-16 text-right">0</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 실시간 매치 스탯 데이터 테이블 -->
+        <div class="bg-slate-800/90 p-4 rounded-2xl border border-slate-700/60 shadow-lg text-xs">
+          <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">📊 매치 세부 기록 요약</h2>
+          <div class="grid grid-cols-3 gap-2 text-center bg-slate-950 p-3 rounded-xl border border-slate-800 font-mono">
+            <div class="text-emerald-400 font-bold text-sm" id="stat-p1-aces">0</div>
+            <div class="text-slate-400 text-[10px]">에이스 (Aces)</div>
+            <div class="text-cyan-400 font-bold text-sm" id="stat-p2-aces">0</div>
+
+            <div class="text-emerald-400 font-bold text-sm" id="stat-p1-winners">0</div>
+            <div class="text-slate-400 text-[10px]">위너 (Winners)</div>
+            <div class="text-cyan-400 font-bold text-sm" id="stat-p2-winners">0</div>
+
+            <div class="text-emerald-400 font-bold text-sm" id="stat-p1-errors">0</div>
+            <div class="text-slate-400 text-[10px]">범실 (Errors)</div>
+            <div class="text-cyan-400 font-bold text-sm" id="stat-p2-errors">0</div>
+
+            <div class="text-emerald-400 font-bold text-sm" id="stat-p1-df">0</div>
+            <div class="text-slate-400 text-[10px]">더블폴트 (DF)</div>
+            <div class="text-cyan-400 font-bold text-sm" id="stat-p2-df">0</div>
+          </div>
+        </div>
+
+        <!-- 중계 문자 로그 -->
+        <div class="bg-slate-800/90 p-4 rounded-2xl border border-slate-700/60 shadow-lg flex flex-col">
+          <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center justify-between">
+            <span>📜 실시간 중계 문자 로그</span>
+            <span class="text-[10px] text-slate-500">LIVE COMMENTARY</span>
+          </h2>
+          <div id="log-box" class="custom-scrollbar bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs font-mono h-40 overflow-y-auto space-y-1.5 text-slate-300">
+            <div class="text-slate-500">경기가 준비되었습니다. 진행 버튼을 클릭하세요.</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 우측 패널 (2D 테니스 코트 캔버스 & TV 오버레이) -->
+      <div class="lg:col-span-7 flex flex-col">
+        <div class="bg-slate-800/90 p-4 md:p-5 rounded-2xl border border-slate-700/60 shadow-lg h-full flex flex-col justify-between">
+          
+          <!-- TV 방송 스타일 캔버스 상단 상태바 -->
+          <div class="w-full flex justify-between items-center mb-3 px-1">
+            <span class="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block animate-pulse"></span>
+              LIVE BROADCAST COURT
+            </span>
+            <span id="court-action-text" class="text-xs font-semibold text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-lg border border-amber-500/20">대기 중</span>
+          </div>
+
+          <!-- 캔버스 및 오버레이 래퍼 -->
+          <div id="canvas-container" class="w-full flex-grow relative flex items-center justify-center min-h-[420px] md:min-h-[520px] bg-slate-950 rounded-xl border border-slate-700/50 p-2 overflow-hidden shadow-inner">
+            
+            <!-- 캔버스 실시간 자막 오버레이 -->
+            <div id="tv-overlay" class="absolute top-4 left-4 z-10 flex flex-col gap-1 pointer-events-none">
+              <div id="speed-badge" class="hidden bg-slate-900/90 backdrop-blur-md text-amber-400 text-xs md:text-sm font-black px-3 py-1.5 rounded-xl border border-amber-500/40 shadow-xl items-center gap-1.5">
+                <span>⚡ SERVE SPEED:</span> <span id="speed-val" class="font-mono text-base">0</span> <span class="text-[10px]">km/h</span>
+              </div>
+              <div id="rally-badge" class="hidden bg-slate-900/90 backdrop-blur-md text-emerald-400 text-xs md:text-sm font-black px-3 py-1.5 rounded-xl border border-emerald-500/40 shadow-xl items-center gap-1.5">
+                <span>🔄 RALLIES:</span> <span id="rally-val" class="font-mono text-base">0</span>
+              </div>
+            </div>
+
+            <!-- HTML5 Canvas -->
+            <canvas id="tennis-court" class="max-w-full max-h-full block rounded-lg shadow-2xl"></canvas>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // --- 글로벌 매치 상태 데이터 ---
+    let players = {
+      1: { name: "선수 A", serveIn: 0.65, ace: 0.12, winner: 0.22, error: 0.16 },
+      2: { name: "선수 B", serveIn: 0.72, ace: 0.07, winner: 0.15, error: 0.10 }
+    };
+
+    let matchStats = {
+      1: { aces: 0, winners: 0, errors: 0, df: 0 },
+      2: { aces: 0, winners: 0, errors: 0, df: 0 }
+    };
+
+    const pointNames = ["0", "15", "30", "40"];
+    
+    let match = {
+      p1Points: 0, p2Points: 0,
+      p1Games: [0], p2Games: [0],
+      p1Sets: 0, p2Sets: 0,
+      currentSetIndex: 0,
+      isTiebreak: false,
+      isFinished: false,
+      server: 1
+    };
+
+    // 코트 테마 색상 정의
+    const themes = {
+      'us-open': { outer: '#1e3a8a', inner: '#0284c7', line: '#ffffff' },
+      'wimbledon': { outer: '#064e3b', inner: '#047857', line: '#ffffff' },
+      'roland-garros': { outer: '#9a3412', inner: '#c2410c', line: '#ffffff' },
+      'australian': { outer: '#0f766e', inner: '#0284c7', line: '#ffffff' }
+    };
+
+    let currentTheme = 'us-open';
+    let autoInterval = null;
+    let isAnimating = false;
+
+    // --- DOM 요소 참조 ---
+    const p1GameScoreEl = document.getElementById("p1-game-score");
+    const p2GameScoreEl = document.getElementById("p2-game-score");
+    const p1SetsEl = document.getElementById("p1-sets");
+    const p2SetsEl = document.getElementById("p2-sets");
+    const p1Badge = document.getElementById("p1-server-badge");
+    const p2Badge = document.getElementById("p2-server-badge");
+    const statusBanner = document.getElementById("status-banner");
+    const logBox = document.getElementById("log-box");
+    const courtActionText = document.getElementById("court-action-text");
+    const btnPoint = document.getElementById("btn-point");
+    const btnAuto = document.getElementById("btn-auto");
+    const autoText = document.getElementById("auto-text");
+    const autoIcon = document.getElementById("auto-icon");
+
+    // 오버레이 요소
+    const speedBadge = document.getElementById("speed-badge");
+    const speedVal = document.getElementById("speed-val");
+    const rallyBadge = document.getElementById("rally-badge");
+    const rallyVal = document.getElementById("rally-val");
+
+    // 캔버스 설정
+    const canvas = document.getElementById("tennis-court");
+    const ctx = canvas.getContext("2d");
+    const canvasContainer = document.getElementById("canvas-container");
+
+    let courtWidth, courtHeight;
+    let courtX, courtY, courtW, courtH;
+    let ball = { x: 0, y: 0, z: 0, active: false };
+    let ballTrail = [];
+
+    // 캔버스 크기 리사이징
+    function resizeCanvas() {
+      const containerWidth = canvasContainer.clientWidth - 16;
+      const containerHeight = canvasContainer.clientHeight - 16;
+      
+      let w = containerWidth;
+      let h = containerHeight;
+
+      if (h * 0.55 > w) {
+        h = w / 0.55;
+      } else {
+        w = h * 0.55;
+      }
+
+      canvas.width = w;
+      canvas.height = h;
+      courtWidth = w;
+      courtHeight = h;
+
+      const marginX = w * 0.12;
+      const marginY = h * 0.08;
+      courtX = marginX;
+      courtY = marginY;
+      courtW = w - marginX * 2;
+      courtH = h - marginY * 2;
+
+      drawScene();
+    }
+
+    window.addEventListener("resize", resizeCanvas);
+
+    // --- 2D 테니스 코트 그리기 ---
+    function drawScene(landingPoint = null, resultType = null) {
+      ctx.clearRect(0, 0, courtWidth, courtHeight);
+      const theme = themes[currentTheme];
+
+      // 1. 코트 아웃 영역 (아웃 코트)
+      ctx.fillStyle = theme.outer;
+      ctx.fillRect(0, 0, courtWidth, courtHeight);
+
+      // 2. 코트 인 영역 (인 코트)
+      ctx.fillStyle = theme.inner;
+      ctx.fillRect(courtX, courtY, courtW, courtH);
+
+      // 3. 코트 라인
+      ctx.strokeStyle = theme.line;
+      ctx.lineWidth = Math.max(2, courtWidth * 0.008);
+
+      // 외곽선
+      ctx.strokeRect(courtX, courtY, courtW, courtH);
+
+      // 단식 라인
+      const singlesMargin = courtW * 0.12;
+      const leftSinglesX = courtX + singlesMargin;
+      const rightSinglesX = courtX + courtW - singlesMargin;
+
+      ctx.beginPath();
+      ctx.moveTo(leftSinglesX, courtY);
+      ctx.lineTo(leftSinglesX, courtY + courtH);
+      ctx.moveTo(rightSinglesX, courtY);
+      ctx.lineTo(rightSinglesX, courtY + courtH);
+      ctx.stroke();
+
+      // 네트 중심선 및 서비스 라인
+      const netY = courtY + courtH / 2;
+      const serviceDist = courtH * 0.28;
+      const topServiceY = netY - serviceDist;
+      const bottomServiceY = netY + serviceDist;
+
+      ctx.beginPath();
+      ctx.moveTo(leftSinglesX, topServiceY);
+      ctx.lineTo(rightSinglesX, topServiceY);
+      ctx.moveTo(leftSinglesX, bottomServiceY);
+      ctx.lineTo(rightSinglesX, bottomServiceY);
+      
+      const centerSinglesX = courtX + courtW / 2;
+      ctx.moveTo(centerSinglesX, topServiceY);
+      ctx.lineTo(centerSinglesX, bottomServiceY);
+      
+      const markLength = courtH * 0.02;
+      ctx.moveTo(centerSinglesX, courtY);
+      ctx.lineTo(centerSinglesX, courtY + markLength);
+      ctx.moveTo(centerSinglesX, courtY + courtH);
+      ctx.lineTo(centerSinglesX, courtY + courtH - markLength);
+      ctx.stroke();
+
+      // 네트 그리기
+      ctx.save();
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.9)";
+      ctx.lineWidth = Math.max(3, courtWidth * 0.012);
+      ctx.beginPath();
+      ctx.moveTo(courtX - 10, netY);
+      ctx.lineTo(courtX + courtW + 10, netY);
+      ctx.stroke();
+      
+      ctx.fillStyle = "#e2e8f0";
+      ctx.fillRect(courtX - 12, netY - 4, 6, 8);
+      ctx.fillRect(courtX + courtW + 6, netY - 4, 6, 8);
+      ctx.restore();
+
+      // 4. 선수 원형 아이콘
+      const p1Y = courtY - 12;
+      const p2Y = courtY + courtH + 12;
+
+      // 선수 A (상단)
+      ctx.fillStyle = "#34d399";
+      ctx.beginPath();
+      ctx.arc(centerSinglesX, p1Y, courtWidth * 0.028, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = "#ffffff";
+      ctx.font = `bold ${Math.max(10, courtWidth * 0.025)}px Inter`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText("A", centerSinglesX, p1Y);
+
+      // 선수 B (하단)
+      ctx.fillStyle = "#22d3ee";
+      ctx.beginPath();
+      ctx.arc(centerSinglesX, p2Y, courtWidth * 0.028, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = "#ffffff";
+      ctx.fillText("B", centerSinglesX, p2Y);
+
+      // 서브 표시기
+      const serverY = match.server === 1 ? p1Y : p2Y;
+      ctx.fillStyle = "#f59e0b";
+      ctx.font = `bold ${Math.max(12, courtWidth * 0.03)}px Inter`;
+      ctx.fillText("★", centerSinglesX - courtWidth * 0.05, serverY);
+
+      // 5. 공 잔상 궤적
+      for (let i = 0; i < ballTrail.length; i++) {
+        const point = ballTrail[i];
+        const alpha = (i + 1) / ballTrail.length * 0.5;
+        ctx.fillStyle = `rgba(234, 179, 8, ${alpha})`;
+        ctx.beginPath();
+        ctx.arc(point.x, point.y, Math.max(2, courtWidth * 0.01), 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // 6. 공 위치 그리기
+      if (ball.active) {
+        // 공 그림자
+        ctx.fillStyle = "rgba(0, 0, 0, 0.35)";
+        ctx.beginPath();
+        ctx.arc(ball.x, ball.y + ball.z * 0.3, Math.max(3, courtWidth * 0.015), 0, Math.PI * 2);
+        ctx.fill();
+
+        // 테니스 공 (형광 노랑)
+        ctx.fillStyle = "#a3e635";
+        ctx.beginPath();
+        ctx.arc(ball.x, ball.y - ball.z, Math.max(4, courtWidth * 0.018), 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = "#ffffff";
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
+
+      // 7. 최종 착지점 링 표기
+      if (landingPoint) {
+        ctx.save();
+        ctx.strokeStyle = resultType === "error" || resultType === "double_fault" ? "#ef4444" : "#10b981";
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(landingPoint.x, landingPoint.y, 8, 0, Math.PI * 2);
+        ctx.stroke();
+
+        ctx.fillStyle = resultType === "error" || resultType === "double_fault" ? "#f87171" : "#34d399";
+        ctx.font = `bold ${Math.max(11, courtWidth * 0.028)}px Inter`;
+        ctx.fillText(resultType.toUpperCase().replace('_', ' '), landingPoint.x, landingPoint.y - 14);
+        ctx.restore();
+      }
+    }
+
+    // --- 애니메이션 로직 ---
+    function animatePoint(rallySequence, onComplete) {
+      isAnimating = true;
+      ball.active = true;
+      ballTrail = [];
+      
+      let stepIndex = 0;
+      let progress = 0;
+      const speed = 0.065;
+
+      function step() {
+        if (stepIndex >= rallySequence.length - 1) {
+          ball.active = false;
+          const finalPoint = rallySequence[rallySequence.length - 1];
+          drawScene(finalPoint, finalPoint.type);
+          isAnimating = false;
+          if (onComplete) onComplete();
+          return;
+        }
+
+        const currentStart = rallySequence[stepIndex];
+        const currentEnd = rallySequence[stepIndex + 1];
+
+        progress += speed;
+
+        if (progress >= 1) {
+          progress = 0;
+          stepIndex++;
+          ballTrail.push({ x: currentEnd.x, y: currentEnd.y });
+          if (ballTrail.length > 8) ballTrail.shift();
+        }
+
+        const p1 = rallySequence[stepIndex] || currentStart;
+        const p2 = rallySequence[stepIndex + 1] || currentEnd;
+
+        ball.x = p1.x + (p2.x - p1.x) * progress;
+        ball.y = p1.y + (p2.y - p1.y) * progress;
+        ball.z = Math.sin(progress * Math.PI) * (courtHeight * 0.08);
+
+        drawScene();
+        requestAnimationFrame(step);
+      }
+
+      requestAnimationFrame(step);
+    }
+
+    // --- 랠리 경로 및 스피드 생성 ---
+    function generateRallyPath(winner, pointType) {
+      const isP1Server = match.server === 1;
+      const centerSinglesX = courtX + courtW / 2;
+      const leftSinglesX = courtX + courtW * 0.12;
+      const rightSinglesX = courtX + courtW * 0.88;
+      const netY = courtY + courtH / 2;
+
+      const serverY = isP1Server ? courtY : courtY + courtH;
+      let path = [];
+
+      path.push({ x: centerSinglesX + (Math.random() * 20 - 10), y: serverY, type: "start" });
+
+      if (pointType === "double_fault") {
+        path.push({ x: centerSinglesX + (Math.random() * 40 - 20), y: netY + (isP1Server ? 15 : -15), type: "double_fault" });
+        return { path, rallies: 0 };
+      }
+
+      if (pointType === "ace") {
+        const targetX = Math.random() < 0.5 ? leftSinglesX + 15 : rightSinglesX - 15;
+        const targetY = isP1Server ? netY + courtH * 0.22 : netY - courtH * 0.22;
+        path.push({ x: targetX, y: targetY, type: "ace" });
+        return { path, rallies: 1 };
+      }
+
+      const rallyCount = Math.floor(Math.random() * 4) + 2;
+      let currentSide = isP1Server ? "top" : "bottom";
+
+      for (let i = 0; i < rallyCount; i++) {
+        const nextSide = currentSide === "top" ? "bottom" : "top";
+        const rx = leftSinglesX + Math.random() * (rightSinglesX - leftSinglesX);
+        const ry = nextSide === "top" ? courtY + courtH * 0.15 + Math.random() * 30 : courtY + courtH * 0.85 - Math.random() * 30;
+        
+        path.push({ x: rx, y: ry, type: "rally" });
+        currentSide = nextSide;
+      }
+
+      const finalSide = currentSide === "top" ? "bottom" : "top";
+      let finalX, finalY;
+
+      if (pointType === "winner") {
+        finalX = Math.random() < 0.5 ? leftSinglesX + 10 : rightSinglesX - 10;
+        finalY = finalSide === "top" ? courtY + 15 : courtY + courtH - 15;
+      } else {
+        if (Math.random() < 0.5) {
+          finalX = Math.random() < 0.5 ? courtX - 20 : courtX + courtW + 20;
+          finalY = finalSide === "top" ? courtY - 20 : courtY + courtH + 20;
+        } else {
+          finalX = centerSinglesX + (Math.random() * 60 - 30);
+          finalY = netY + (finalSide === "top" ? -10 : 10);
+        }
+      }
+
+      path.push({ x: finalX, y: finalY, type: pointType });
+      return { path, rallies: rallyCount + 1 };
+    }
+
+    // --- 시뮬레이션 및 포인트 처리 엔진 ---
+    document.getElementById("btn-apply-stats").addEventListener("click", () => {
+      players[1].serveIn = parseFloat(document.getElementById("p1-serve").value);
+      players[1].ace = parseFloat(document.getElementById("p1-ace").value);
+      players[1].winner = parseFloat(document.getElementById("p1-winner").value);
+      players[1].error = parseFloat(document.getElementById("p1-error").value);
+
+      players[2].serveIn = parseFloat(document.getElementById("p2-serve").value);
+      players[2].ace = parseFloat(document.getElementById("p2-ace").value);
+      players[2].winner = parseFloat(document.getElementById("p2-winner").value);
+      players[2].error = parseFloat(document.getElementById("p2-error").value);
+
+      addLog("⚙️ 선수 커스텀 스탯이 정상적으로 적용되었습니다.");
+    });
+
+    function addLog(text, className = "") {
+      const entry = document.createElement("div");
+      entry.className = `leading-relaxed ${className}`;
+      entry.textContent = text;
+      logBox.appendChild(entry);
+      logBox.scrollTop = logBox.scrollHeight;
+    }
+
+    function getPressureContext() {
+      if (match.isTiebreak) return { isDeuce: false, isBreakPoint: false };
+
+      const p1 = match.p1Points;
+      const p2 = match.p2Points;
+      const server = match.server;
+
+      let isDeuce = (p1 >= 3 && p2 >= 3 && p1 === p2);
+      let isBreakPoint = false;
+
+      if (server === 1) {
+        if ((p2 >= 3 && p2 - p1 >= 1) || (p1 === 3 && p2 === 4)) isBreakPoint = true;
+      } else {
+        if ((p1 >= 3 && p1 - p2 >= 1) || (p2 === 3 && p1 === 4)) isBreakPoint = true;
+      }
+
+      return { isDeuce, isBreakPoint };
+    }
+
+    function simulatePoint() {
+      if (match.isFinished || isAnimating) return;
+
+      const serverObj = players[match.server];
+      const returnerObj = players[match.server === 1 ? 2 : 1];
+      const pressure = getPressureContext();
+
+      if (pressure.isDeuce) {
+        statusBanner.className = "w-full py-2.5 px-4 rounded-xl text-center font-black text-sm md:text-base border bg-amber-500/20 text-amber-300 border-amber-500/40 shadow-lg block animate-pulse";
+        statusBanner.textContent = "🔥 [DEUCE] 긴장감이 고조되는 듀스 상황!";
+      } else if (pressure.isBreakPoint) {
+        statusBanner.className = "w-full py-2.5 px-4 rounded-xl text-center font-black text-sm md:text-base border bg-rose-500/20 text-rose-300 border-rose-500/40 shadow-lg block animate-pulse";
+        statusBanner.textContent = `⚠️ [BREAK POINT] ${returnerObj.name}의 브레이크 기회!`;
+      } else {
+        statusBanner.className = "hidden";
+      }
+
+      let errorPenalty = pressure.isBreakPoint || pressure.isDeuce ? 0.05 : 0;
+      let successPenalty = pressure.isBreakPoint || pressure.isDeuce ? 0.03 : 0;
+
+      let currentServeIn = Math.max(0, serverObj.serveIn - successPenalty);
+      let currentAce = Math.max(0, serverObj.ace - successPenalty);
+      let currentWinner = Math.max(0, serverObj.winner - successPenalty);
+      let currentError = Math.min(1, serverObj.error + errorPenalty);
+      let returnerError = Math.min(1, returnerObj.error + errorPenalty);
+
+      let winner, pointType, logMsg, logClass;
+
+      // 1. 서브 검사
+      let serveSuccess = Math.random() < currentServeIn;
+      if (!serveSuccess) {
+        let secondServeIn = Math.random() < (currentServeIn + 0.15);
+        if (!secondServeIn) {
+          winner = match.server === 1 ? 2 : 1;
+          pointType = "double_fault";
+          matchStats[match.server].df++;
+          logMsg = `[더블폴트] ${serverObj.name} 2nd 서브 실패 ➔ ${players[winner].name} 득점`;
+          logClass = "text-rose-400 font-semibold";
+          runPointAnimation(winner, pointType, logMsg, logClass);
+          return;
+        }
+      }
+
+      // 2. 에이스 검사
+      if (Math.random() < currentAce) {
+        winner = match.server;
+        pointType = "ace";
+        matchStats[winner].aces++;
+        logMsg = `[서브 에이스] ⚡ ${serverObj.name} 서브 에이스 득점!`;
+        logClass = "text-amber-300 font-bold";
+        runPointAnimation(winner, pointType, logMsg, logClass);
+        return;
+      }
+
+      // 3. 랠리 진행 검사
+      let rand = Math.random();
+      if (rand < currentWinner) {
+        winner = match.server;
+        pointType = "winner";
+        matchStats[winner].winners++;
+        logMsg = `[위너] 🎯 ${serverObj.name} 위너 성공!`;
+        logClass = "text-emerald-300 font-semibold";
+      } else if (rand < currentWinner + returnerError) {
+        winner = match.server;
+        pointType = "error";
+        matchStats[match.server === 1 ? 2 : 1].errors++;
+        logMsg = `[범실] ${returnerObj.name} 리턴 범실 (Unforced Error)`;
+        logClass = "text-rose-300";
+      } else if (rand < currentWinner + returnerError + returnerObj.winner) {
+        winner = match.server === 1 ? 2 : 1;
+        pointType = "winner";
+        matchStats[winner].winners++;
+        logMsg = `[역습 위너] ⚡ ${returnerObj.name} 다운더라인 패싱샷 성공!`;
+        logClass = "text-cyan-300 font-semibold";
+      } else {
+        winner = match.server === 1 ? 2 : 1;
+        pointType = "error";
+        matchStats[match.server].errors++;
+        logMsg = `[범실] ${serverObj.name} 랠리 중 네트 걸림 범실`;
+        logClass = "text-rose-400";
+      }
+
+      runPointAnimation(winner, pointType, logMsg, logClass);
+    }
+
+    function runPointAnimation(winner, pointType, logMsg, logClass) {
+      const rallyData = generateRallyPath(winner, pointType);
+      
+      // 서브 속도 및 랠리 오버레이 업데이트
+      const serveSpeed = pointType === "ace" ? Math.floor(Math.random() * 25 + 195) : Math.floor(Math.random() * 30 + 165);
+      speedVal.textContent = serveSpeed;
+      rallyVal.textContent = rallyData.rallies;
+
+      speedBadge.classList.remove("hidden");
+      speedBadge.classList.add("flex");
+      rallyBadge.classList.remove("hidden");
+      rallyBadge.classList.add("flex");
+
+      courtActionText.textContent = `랠리 진행 중... (${pointType.toUpperCase()})`;
+
+      animatePoint(rallyData.path, () => {
+        courtActionText.textContent = `포인트 종료: ${players[winner].name} 득점`;
+        awardPoint(winner, logMsg, logClass);
+      });
+    }
+
+    function awardPoint(winner, message, logClass) {
+      if (winner === 1) match.p1Points++;
+      else match.p2Points++;
+
+      addLog(`• ${message}`, logClass);
+
+      if (match.isTiebreak) handleTiebreakScoring();
+      else handleStandardScoring();
+
+      updateUI();
+    }
+
+    function handleStandardScoring() {
+      if (match.p1Points >= 4 && match.p1Points - match.p2Points >= 2) winGame(1);
+      else if (match.p2Points >= 4 && match.p2Points - match.p1Points >= 2) winGame(2);
+    }
+
+    function handleTiebreakScoring() {
+      if (match.p1Points >= 7 && match.p1Points - match.p2Points >= 2) winGame(1);
+      else if (match.p2Points >= 7 && match.p2Points - match.p1Points >= 2) winGame(2);
+    }
+
+    function winGame(player) {
+      const idx = match.currentSetIndex;
+      if (player === 1) match.p1Games[idx]++;
+      else match.p2Games[idx]++;
+
+      addLog(`➔ [게임 획득] ${players[player].name} (${match.p1Games[idx]} - ${match.p2Games[idx]})`, "text-emerald-400 font-bold bg-emerald-950/40 p-1 rounded border border-emerald-500/20");
+
+      match.p1Points = 0;
+      match.p2Points = 0;
+      match.server = match.server === 1 ? 2 : 1;
+
+      checkSetWinner();
+    }
+
+    function checkSetWinner() {
+      const idx = match.currentSetIndex;
+      const g1 = match.p1Games[idx];
+      const g2 = match.p2Games[idx];
+
+      if (g1 === 6 && g2 === 6 && !match.isTiebreak) {
+        match.isTiebreak = true;
+        addLog("⚡ [타이브레이크] 6-6 동점! 7점 선승 타이브레이크 돌입!", "text-amber-300 font-bold");
+        return;
+      }
+
+      let setWinner = 0;
+      if (match.isTiebreak) {
+        if (g1 === 7) setWinner = 1;
+        if (g2 === 7) setWinner = 2;
+      } else {
+        if (g1 >= 6 && g1 - g2 >= 2) setWinner = 1;
+        if (g2 >= 6 && g2 - g1 >= 2) setWinner = 2;
+      }
+
+      if (setWinner !== 0) {
+        if (setWinner === 1) match.p1Sets++;
+        else match.p2Sets++;
+
+        addLog(`🏆 [세트 획득] ${players[setWinner].name} 세트 승리! (${g1} - ${g2})`, "text-cyan-300 font-extrabold bg-cyan-950/60 p-1.5 rounded border border-cyan-500/30");
+        match.isTiebreak = false;
+
+        if (match.p1Sets === 2 || match.p2Sets === 2) {
+          match.isFinished = true;
+          const matchWinner = match.p1Sets === 2 ? 1 : 2;
+          addLog(`🎉 [최종 우승] ${players[matchWinner].name} 매치 승리!`, "text-purple-300 font-black text-sm bg-purple-950/80 p-2 rounded border border-purple-500/40");
+          stopAuto();
+          
+          statusBanner.className = "w-full py-3 px-4 rounded-xl text-center font-black text-base bg-purple-600 text-white shadow-xl block animate-bounce";
+          statusBanner.textContent = `🎉🏆 최종 우승: ${players[matchWinner].name} (세트 스코어 ${match.p1Sets}-${match.p2Sets}) 🏆🎉`;
+        } else {
+          match.currentSetIndex++;
+          match.p1Games.push(0);
+          match.p2Games.push(0);
+        }
+      }
+    }
+
+    function getGameScoreDisplay() {
+      if (match.isTiebreak) return { p1: match.p1Points, p2: match.p2Points };
+      const p1 = match.p1Points;
+      const p2 = match.p2Points;
+
+      if (p1 >= 3 && p2 >= 3) {
+        if (p1 === p2) return { p1: "40", p2: "40" };
+        if (p1 - p2 === 1) return { p1: "AD", p2: "40" };
+        if (p2 - p1 === 1) return { p1: "40", p2: "AD" };
+      }
+      return { p1: pointNames[p1] || "0", p2: pointNames[p2] || "0" };
+    }
+
+    function updateUI() {
+      const currentScore = getGameScoreDisplay();
+      p1GameScoreEl.textContent = currentScore.p1;
+      p2GameScoreEl.textContent = currentScore.p2;
+
+      p1SetsEl.textContent = "게임: " + match.p1Games.join(" | ") + ` (세트: ${match.p1Sets})`;
+      p2SetsEl.textContent = "게임: " + match.p2Games.join(" | ") + ` (세트: ${match.p2Sets})`;
+
+      if (match.server === 1) {
+        p1Badge.classList.remove("hidden");
+        p2Badge.classList.add("hidden");
+      } else {
+        p1Badge.classList.add("hidden");
+        p2Badge.classList.remove("hidden");
+      }
+
+      // 통계표 업데이트
+      document.getElementById("stat-p1-aces").textContent = matchStats[1].aces;
+      document.getElementById("stat-p2-aces").textContent = matchStats[2].aces;
+      document.getElementById("stat-p1-winners").textContent = matchStats[1].winners;
+      document.getElementById("stat-p2-winners").textContent = matchStats[2].winners;
+      document.getElementById("stat-p1-errors").textContent = matchStats[1].errors;
+      document.getElementById("stat-p2-errors").textContent = matchStats[2].errors;
+      document.getElementById("stat-p1-df").textContent = matchStats[1].df;
+      document.getElementById("stat-p2-df").textContent = matchStats[2].df;
+    }
+
+    // --- 코트 테마 변경 이벤트 핸들러 ---
+    document.querySelectorAll('.theme-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('ring-2', 'ring-white'));
+        e.target.classList.add('ring-2', 'ring-white');
+        currentTheme = e.target.getAttribute('data-theme');
+        drawScene();
+      });
+    });
+
+    // --- 컨트롤 버튼 이벤트 리스너 ---
+    btnPoint.addEventListener("click", () => {
+      if (!isAnimating) simulatePoint();
+    });
+
+    function toggleAuto() {
+      if (autoInterval) {
+        stopAuto();
+      } else {
+        if (match.isFinished) return;
+        autoText.textContent = "정지";
+        autoIcon.textContent = "⏸️";
+        btnAuto.classList.remove("from-cyan-500", "to-blue-600");
+        btnAuto.classList.add("from-amber-500", "to-orange-600");
+        
+        simulatePoint();
+        autoInterval = setInterval(() => {
+          if (!isAnimating && !match.isFinished) {
+            simulatePoint();
+          }
+        }, 1100);
+      }
+    }
+
+    function stopAuto() {
+      if (autoInterval) {
+        clearInterval(autoInterval);
+        autoInterval = null;
+      }
+      autoText.textContent = "자동 진행";
+      autoIcon.textContent = "⏩";
+      btnAuto.classList.remove("from-amber-500", "to-orange-600");
+      btnAuto.classList.add("from-cyan-500", "to-blue-600");
+    }
+
+    btnAuto.addEventListener("click", toggleAuto);
+
+    document.getElementById("btn-reset").addEventListener("click", () => {
+      stopAuto();
+      match = {
+        p1Points: 0, p2Points: 0,
+        p1Games: [0], p2Games: [0],
+        p1Sets: 0, p2Sets: 0,
+        currentSetIndex: 0,
+        isTiebreak: false, isFinished: false,
+        server: 1
+      };
+      matchStats = {
+        1: { aces: 0, winners: 0, errors: 0, df: 0 },
+        2: { aces: 0, winners: 0, errors: 0, df: 0 }
+      };
+      statusBanner.className = "hidden";
+      speedBadge.classList.add("hidden");
+      rallyBadge.classList.add("hidden");
+      courtActionText.textContent = "대기 중";
+      logBox.innerHTML = '<div class="text-slate-500">경기가 리셋되었습니다.</div>';
+      updateUI();
+      resizeCanvas();
+    });
+
+    // 온로드 초기화
+    window.onload = function() {
+      resizeCanvas();
+      updateUI();
+    };
+  </script>
+</body>
+</html>
