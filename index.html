@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🎾 TV 중계 스타일 테니스 매치 시뮬레이터</title>
+  <title>🎾 TV Broadcast-Style Tennis Match Simulator</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
@@ -40,19 +40,19 @@
         <h1 class="text-2xl md:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 flex items-center gap-2">
           <span>🎾</span> TV BROADCAST TENNIS SIMULATOR
         </h1>
-        <p class="text-xs md:text-sm text-slate-400 mt-1">실시간 물리 랠리 궤적 시각화 & 스탯 기반 경기 시뮬레이션</p>
+        <p class="text-xs md:text-sm text-slate-400 mt-1">Real-time rally trajectory visualization & stats-based match simulation</p>
       </div>
 
       <!-- 상단 컨트롤 버튼 -->
       <div class="flex flex-wrap gap-2 mt-4 md:mt-0">
         <button id="btn-point" class="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold px-4 py-2.5 rounded-xl shadow-lg transition active:scale-95 disabled:opacity-50 text-sm flex items-center gap-1.5">
-          <span>▶</span> 1포인트 진행
+          <span>▶</span> Play Point
         </button>
         <button id="btn-auto" class="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-bold px-4 py-2.5 rounded-xl shadow-lg transition active:scale-95 disabled:opacity-50 text-sm flex items-center gap-1.5">
-          <span id="auto-icon">⏩</span> <span id="auto-text">자동 진행</span>
+          <span id="auto-icon">⏩</span> <span id="auto-text">Auto Play</span>
         </button>
         <button id="btn-reset" class="bg-gradient-to-r from-rose-500 to-red-600 hover:from-rose-600 hover:to-red-700 text-white font-bold px-4 py-2.5 rounded-xl shadow-lg transition active:scale-95 text-sm flex items-center gap-1.5">
-          <span>🔄</span> 리셋
+          <span>🔄</span> Reset
         </button>
       </div>
     </header>
@@ -70,14 +70,14 @@
         <!-- 코트 테마 변경 패널 -->
         <div class="bg-slate-800/90 p-4 rounded-2xl border border-slate-700/60 shadow-lg">
           <h2 class="text-xs uppercase tracking-wider font-extrabold text-slate-400 mb-3 flex items-center justify-between">
-            <span>🏟️ 코트 표면 테마 선택</span>
+            <span>🏟️ Court Surface</span>
             <span class="text-[10px] text-teal-400 font-mono">SURFACE SELECT</span>
           </h2>
           <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
-            <button class="theme-btn active bg-blue-600 text-white p-2 rounded-xl text-xs font-bold border border-blue-400 hover:bg-blue-500 transition" data-theme="us-open">US 하드</button>
-            <button class="theme-btn bg-emerald-700 text-white p-2 rounded-xl text-xs font-bold border border-emerald-500 hover:bg-emerald-600 transition" data-theme="wimbledon">윔블던 잔디</button>
-            <button class="theme-btn bg-amber-700 text-white p-2 rounded-xl text-xs font-bold border border-amber-500 hover:bg-amber-600 transition" data-theme="roland-garros">롤랑가로스</button>
-            <button class="theme-btn bg-teal-600 text-white p-2 rounded-xl text-xs font-bold border border-teal-400 hover:bg-teal-500 transition" data-theme="australian">호주 하드</button>
+            <button class="theme-btn active bg-blue-600 text-white p-2 rounded-xl text-xs font-bold border border-blue-400 hover:bg-blue-500 transition" data-theme="us-open">US Open Hard</button>
+            <button class="theme-btn bg-emerald-700 text-white p-2 rounded-xl text-xs font-bold border border-emerald-500 hover:bg-emerald-600 transition" data-theme="wimbledon">Wimbledon Grass</button>
+            <button class="theme-btn bg-amber-700 text-white p-2 rounded-xl text-xs font-bold border border-amber-500 hover:bg-amber-600 transition" data-theme="roland-garros">Roland-Garros Clay</button>
+            <button class="theme-btn bg-teal-600 text-white p-2 rounded-xl text-xs font-bold border border-teal-400 hover:bg-teal-500 transition" data-theme="australian">Australian Open Hard</button>
           </div>
         </div>
 
@@ -85,10 +85,10 @@
         <div class="bg-slate-800/90 p-4 md:p-5 rounded-2xl border border-slate-700/60 shadow-lg">
           <div class="flex justify-between items-center mb-3">
             <h2 class="text-base font-bold text-slate-200 flex items-center gap-2">
-              <span>⚙️</span> 선수 스탯 설정
+              <span>⚙️</span> Player Stats
             </h2>
             <button id="btn-apply-stats" class="text-xs bg-slate-700 hover:bg-slate-600 text-emerald-400 font-bold px-3 py-1.5 rounded-lg border border-emerald-500/30 transition">
-              스탯 적용
+              Apply Stats
             </button>
           </div>
 
@@ -96,24 +96,24 @@
             <!-- 선수 A -->
             <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-700/40">
               <div class="text-xs font-bold text-emerald-400 mb-2 flex items-center justify-between">
-                <span>선수 A (상단 코트)</span>
-                <span class="text-[10px] text-slate-400">공격형 파이터</span>
+                <span>Player A (Top Court)</span>
+                <span class="text-[10px] text-slate-400">Aggressive Baseliner</span>
               </div>
               <div class="grid grid-cols-4 gap-2 text-xs">
                 <div>
-                  <label class="block text-slate-400 text-[10px] mb-1">1서브인</label>
+                  <label class="block text-slate-400 text-[10px] mb-1">First Serve In</label>
                   <input type="number" id="p1-serve" value="0.65" step="0.01" min="0" max="1" class="w-full bg-slate-800 border border-slate-600 rounded p-1 text-center font-mono focus:outline-none focus:border-emerald-500">
                 </div>
                 <div>
-                  <label class="block text-slate-400 text-[10px] mb-1">에이스</label>
+                  <label class="block text-slate-400 text-[10px] mb-1">Aces</label>
                   <input type="number" id="p1-ace" value="0.12" step="0.01" min="0" max="1" class="w-full bg-slate-800 border border-slate-600 rounded p-1 text-center font-mono focus:outline-none focus:border-emerald-500">
                 </div>
                 <div>
-                  <label class="block text-slate-400 text-[10px] mb-1">위너</label>
+                  <label class="block text-slate-400 text-[10px] mb-1">Winners</label>
                   <input type="number" id="p1-winner" value="0.22" step="0.01" min="0" max="1" class="w-full bg-slate-800 border border-slate-600 rounded p-1 text-center font-mono focus:outline-none focus:border-emerald-500">
                 </div>
                 <div>
-                  <label class="block text-slate-400 text-[10px] mb-1">범실</label>
+                  <label class="block text-slate-400 text-[10px] mb-1">Errors</label>
                   <input type="number" id="p1-error" value="0.16" step="0.01" min="0" max="1" class="w-full bg-slate-800 border border-slate-600 rounded p-1 text-center font-mono focus:outline-none focus:border-emerald-500">
                 </div>
               </div>
@@ -122,24 +122,24 @@
             <!-- 선수 B -->
             <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-700/40">
               <div class="text-xs font-bold text-cyan-400 mb-2 flex items-center justify-between">
-                <span>선수 B (하단 코트)</span>
-                <span class="text-[10px] text-slate-400">안정형 수비수</span>
+                <span>Player B (Bottom Court)</span>
+                <span class="text-[10px] text-slate-400">Defensive Counterpuncher</span>
               </div>
               <div class="grid grid-cols-4 gap-2 text-xs">
                 <div>
-                  <label class="block text-slate-400 text-[10px] mb-1">1서브인</label>
+                  <label class="block text-slate-400 text-[10px] mb-1">First Serve In</label>
                   <input type="number" id="p2-serve" value="0.72" step="0.01" min="0" max="1" class="w-full bg-slate-800 border border-slate-600 rounded p-1 text-center font-mono focus:outline-none focus:border-cyan-500">
                 </div>
                 <div>
-                  <label class="block text-slate-400 text-[10px] mb-1">에이스</label>
+                  <label class="block text-slate-400 text-[10px] mb-1">Aces</label>
                   <input type="number" id="p2-ace" value="0.07" step="0.01" min="0" max="1" class="w-full bg-slate-800 border border-slate-600 rounded p-1 text-center font-mono focus:outline-none focus:border-cyan-500">
                 </div>
                 <div>
-                  <label class="block text-slate-400 text-[10px] mb-1">위너</label>
+                  <label class="block text-slate-400 text-[10px] mb-1">Winners</label>
                   <input type="number" id="p2-winner" value="0.15" step="0.01" min="0" max="1" class="w-full bg-slate-800 border border-slate-600 rounded p-1 text-center font-mono focus:outline-none focus:border-cyan-500">
                 </div>
                 <div>
-                  <label class="block text-slate-400 text-[10px] mb-1">범실</label>
+                  <label class="block text-slate-400 text-[10px] mb-1">Errors</label>
                   <input type="number" id="p2-error" value="0.10" step="0.01" min="0" max="1" class="w-full bg-slate-800 border border-slate-600 rounded p-1 text-center font-mono focus:outline-none focus:border-cyan-500">
                 </div>
               </div>
@@ -157,22 +157,22 @@
           <div class="space-y-3">
             <div class="flex items-center justify-between bg-slate-900/80 p-3 rounded-xl border border-slate-700/40">
               <div class="flex items-center gap-2">
-                <span class="font-bold text-slate-100 text-sm md:text-base">선수 A</span>
+                <span class="font-bold text-slate-100 text-sm md:text-base">Player A</span>
                 <span id="p1-server-badge" class="hidden bg-amber-500 text-slate-950 font-black text-[10px] px-1.5 py-0.5 rounded shadow">SERVE</span>
               </div>
               <div class="flex items-center gap-4">
-                <div id="p1-sets" class="text-xs text-slate-400 font-mono">게임: 0 (세트: 0)</div>
+                <div id="p1-sets" class="text-xs text-slate-400 font-mono">Games: 0 (Sets: 0)</div>
                 <div id="p1-game-score" class="text-xl md:text-2xl font-black font-mono text-emerald-400 w-16 text-right">0</div>
               </div>
             </div>
 
             <div class="flex items-center justify-between bg-slate-900/80 p-3 rounded-xl border border-slate-700/40">
               <div class="flex items-center gap-2">
-                <span class="font-bold text-slate-100 text-sm md:text-base">선수 B</span>
+                <span class="font-bold text-slate-100 text-sm md:text-base">Player B</span>
                 <span id="p2-server-badge" class="hidden bg-amber-500 text-slate-950 font-black text-[10px] px-1.5 py-0.5 rounded shadow">SERVE</span>
               </div>
               <div class="flex items-center gap-4">
-                <div id="p2-sets" class="text-xs text-slate-400 font-mono">게임: 0 (세트: 0)</div>
+                <div id="p2-sets" class="text-xs text-slate-400 font-mono">Games: 0 (Sets: 0)</div>
                 <div id="p2-game-score" class="text-xl md:text-2xl font-black font-mono text-cyan-400 w-16 text-right">0</div>
               </div>
             </div>
@@ -181,22 +181,22 @@
 
         <!-- 실시간 매치 스탯 데이터 테이블 -->
         <div class="bg-slate-800/90 p-4 rounded-2xl border border-slate-700/60 shadow-lg text-xs">
-          <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">📊 매치 세부 기록 요약</h2>
+          <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">📊 Match Statistics</h2>
           <div class="grid grid-cols-3 gap-2 text-center bg-slate-950 p-3 rounded-xl border border-slate-800 font-mono">
             <div class="text-emerald-400 font-bold text-sm" id="stat-p1-aces">0</div>
-            <div class="text-slate-400 text-[10px]">에이스 (Aces)</div>
+            <div class="text-slate-400 text-[10px]">Aces</div>
             <div class="text-cyan-400 font-bold text-sm" id="stat-p2-aces">0</div>
 
             <div class="text-emerald-400 font-bold text-sm" id="stat-p1-winners">0</div>
-            <div class="text-slate-400 text-[10px]">위너 (Winners)</div>
+            <div class="text-slate-400 text-[10px]">Winners</div>
             <div class="text-cyan-400 font-bold text-sm" id="stat-p2-winners">0</div>
 
             <div class="text-emerald-400 font-bold text-sm" id="stat-p1-errors">0</div>
-            <div class="text-slate-400 text-[10px]">범실 (Errors)</div>
+            <div class="text-slate-400 text-[10px]">Errors</div>
             <div class="text-cyan-400 font-bold text-sm" id="stat-p2-errors">0</div>
 
             <div class="text-emerald-400 font-bold text-sm" id="stat-p1-df">0</div>
-            <div class="text-slate-400 text-[10px]">더블폴트 (DF)</div>
+            <div class="text-slate-400 text-[10px]">Double Faults</div>
             <div class="text-cyan-400 font-bold text-sm" id="stat-p2-df">0</div>
           </div>
         </div>
@@ -204,11 +204,11 @@
         <!-- 중계 문자 로그 -->
         <div class="bg-slate-800/90 p-4 rounded-2xl border border-slate-700/60 shadow-lg flex flex-col">
           <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center justify-between">
-            <span>📜 실시간 중계 문자 로그</span>
+            <span>📜 Live Commentary</span>
             <span class="text-[10px] text-slate-500">LIVE COMMENTARY</span>
           </h2>
           <div id="log-box" class="custom-scrollbar bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs font-mono h-40 overflow-y-auto space-y-1.5 text-slate-300">
-            <div class="text-slate-500">경기가 준비되었습니다. 진행 버튼을 클릭하세요.</div>
+            <div class="text-slate-500">Ready to play. Click Play Point to begin.</div>
           </div>
         </div>
 
@@ -224,7 +224,7 @@
               <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block animate-pulse"></span>
               LIVE BROADCAST COURT
             </span>
-            <span id="court-action-text" class="text-xs font-semibold text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-lg border border-amber-500/20">대기 중</span>
+            <span id="court-action-text" class="text-xs font-semibold text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-lg border border-amber-500/20">Ready</span>
           </div>
 
           <!-- 캔버스 및 오버레이 래퍼 -->
@@ -253,8 +253,8 @@
   <script>
     // --- 글로벌 매치 상태 데이터 ---
     let players = {
-      1: { name: "선수 A", serveIn: 0.65, ace: 0.12, winner: 0.22, error: 0.16 },
-      2: { name: "선수 B", serveIn: 0.72, ace: 0.07, winner: 0.15, error: 0.10 }
+      1: { name: "Player A", serveIn: 0.65, ace: 0.12, winner: 0.22, error: 0.16 },
+      2: { name: "Player B", serveIn: 0.72, ace: 0.07, winner: 0.15, error: 0.10 }
     };
 
     let matchStats = {
@@ -605,7 +605,7 @@
       players[2].winner = parseFloat(document.getElementById("p2-winner").value);
       players[2].error = parseFloat(document.getElementById("p2-error").value);
 
-      addLog("⚙️ 선수 커스텀 스탯이 정상적으로 적용되었습니다.");
+      addLog("⚙️ Custom player stats applied successfully.");
     });
 
     function addLog(text, className = "") {
@@ -644,10 +644,10 @@
 
       if (pressure.isDeuce) {
         statusBanner.className = "w-full py-2.5 px-4 rounded-xl text-center font-black text-sm md:text-base border bg-amber-500/20 text-amber-300 border-amber-500/40 shadow-lg block animate-pulse";
-        statusBanner.textContent = "🔥 [DEUCE] 긴장감이 고조되는 듀스 상황!";
+        statusBanner.textContent = "🔥 [DEUCE] The pressure is on!";
       } else if (pressure.isBreakPoint) {
         statusBanner.className = "w-full py-2.5 px-4 rounded-xl text-center font-black text-sm md:text-base border bg-rose-500/20 text-rose-300 border-rose-500/40 shadow-lg block animate-pulse";
-        statusBanner.textContent = `⚠️ [BREAK POINT] ${returnerObj.name}의 브레이크 기회!`;
+        statusBanner.textContent = `⚠️ [BREAK POINT] ${returnerObj.name} has a chance to break!`;
       } else {
         statusBanner.className = "hidden";
       }
@@ -671,7 +671,7 @@
           winner = match.server === 1 ? 2 : 1;
           pointType = "double_fault";
           matchStats[match.server].df++;
-          logMsg = `[더블폴트] ${serverObj.name} 2nd 서브 실패 ➔ ${players[winner].name} 득점`;
+          logMsg = `[DOUBLE FAULT] ${serverObj.name} misses the second serve ➔ ${players[winner].name} wins the point`;
           logClass = "text-rose-400 font-semibold";
           runPointAnimation(winner, pointType, logMsg, logClass);
           return;
@@ -683,7 +683,7 @@
         winner = match.server;
         pointType = "ace";
         matchStats[winner].aces++;
-        logMsg = `[서브 에이스] ⚡ ${serverObj.name} 서브 에이스 득점!`;
+        logMsg = `[ACE] ⚡ ${serverObj.name} wins the point with a serve ace!`;
         logClass = "text-amber-300 font-bold";
         runPointAnimation(winner, pointType, logMsg, logClass);
         return;
@@ -695,25 +695,25 @@
         winner = match.server;
         pointType = "winner";
         matchStats[winner].winners++;
-        logMsg = `[위너] 🎯 ${serverObj.name} 위너 성공!`;
+        logMsg = `[WINNER] 🎯 ${serverObj.name} hits a winner!`;
         logClass = "text-emerald-300 font-semibold";
       } else if (rand < currentWinner + returnerError) {
         winner = match.server;
         pointType = "error";
         matchStats[match.server === 1 ? 2 : 1].errors++;
-        logMsg = `[범실] ${returnerObj.name} 리턴 범실 (Unforced Error)`;
+        logMsg = `[ERROR] ${returnerObj.name} misses the return (unforced error)`;
         logClass = "text-rose-300";
       } else if (rand < currentWinner + returnerError + returnerObj.winner) {
         winner = match.server === 1 ? 2 : 1;
         pointType = "winner";
         matchStats[winner].winners++;
-        logMsg = `[역습 위너] ⚡ ${returnerObj.name} 다운더라인 패싱샷 성공!`;
+        logMsg = `[COUNTERATTACK WINNER] ⚡ ${returnerObj.name} hits a down-the-line passing shot!`;
         logClass = "text-cyan-300 font-semibold";
       } else {
         winner = match.server === 1 ? 2 : 1;
         pointType = "error";
         matchStats[match.server].errors++;
-        logMsg = `[범실] ${serverObj.name} 랠리 중 네트 걸림 범실`;
+        logMsg = `[ERROR] ${serverObj.name} hits the net during the rally`;
         logClass = "text-rose-400";
       }
 
@@ -733,10 +733,10 @@
       rallyBadge.classList.remove("hidden");
       rallyBadge.classList.add("flex");
 
-      courtActionText.textContent = `랠리 진행 중... (${pointType.toUpperCase()})`;
+      courtActionText.textContent = `Rally in progress... (${pointType.toUpperCase()})`;
 
       animatePoint(rallyData.path, () => {
-        courtActionText.textContent = `포인트 종료: ${players[winner].name} 득점`;
+        courtActionText.textContent = `Point over: ${players[winner].name} scores`;
         awardPoint(winner, logMsg, logClass);
       });
     }
@@ -768,7 +768,7 @@
       if (player === 1) match.p1Games[idx]++;
       else match.p2Games[idx]++;
 
-      addLog(`➔ [게임 획득] ${players[player].name} (${match.p1Games[idx]} - ${match.p2Games[idx]})`, "text-emerald-400 font-bold bg-emerald-950/40 p-1 rounded border border-emerald-500/20");
+      addLog(`➔ [GAME WON] ${players[player].name} (${match.p1Games[idx]} - ${match.p2Games[idx]})`, "text-emerald-400 font-bold bg-emerald-950/40 p-1 rounded border border-emerald-500/20");
 
       match.p1Points = 0;
       match.p2Points = 0;
@@ -784,7 +784,7 @@
 
       if (g1 === 6 && g2 === 6 && !match.isTiebreak) {
         match.isTiebreak = true;
-        addLog("⚡ [타이브레이크] 6-6 동점! 7점 선승 타이브레이크 돌입!", "text-amber-300 font-bold");
+        addLog("⚡ [TIEBREAK] At 6-6, the first player to 7 points wins the tiebreak!", "text-amber-300 font-bold");
         return;
       }
 
@@ -801,17 +801,17 @@
         if (setWinner === 1) match.p1Sets++;
         else match.p2Sets++;
 
-        addLog(`🏆 [세트 획득] ${players[setWinner].name} 세트 승리! (${g1} - ${g2})`, "text-cyan-300 font-extrabold bg-cyan-950/60 p-1.5 rounded border border-cyan-500/30");
+        addLog(`🏆 [SET WON] ${players[setWinner].name} wins the set! (${g1} - ${g2})`, "text-cyan-300 font-extrabold bg-cyan-950/60 p-1.5 rounded border border-cyan-500/30");
         match.isTiebreak = false;
 
         if (match.p1Sets === 2 || match.p2Sets === 2) {
           match.isFinished = true;
           const matchWinner = match.p1Sets === 2 ? 1 : 2;
-          addLog(`🎉 [최종 우승] ${players[matchWinner].name} 매치 승리!`, "text-purple-300 font-black text-sm bg-purple-950/80 p-2 rounded border border-purple-500/40");
+          addLog(`🎉 [MATCH WON] ${players[matchWinner].name} wins the match!`, "text-purple-300 font-black text-sm bg-purple-950/80 p-2 rounded border border-purple-500/40");
           stopAuto();
           
           statusBanner.className = "w-full py-3 px-4 rounded-xl text-center font-black text-base bg-purple-600 text-white shadow-xl block animate-bounce";
-          statusBanner.textContent = `🎉🏆 최종 우승: ${players[matchWinner].name} (세트 스코어 ${match.p1Sets}-${match.p2Sets}) 🏆🎉`;
+          statusBanner.textContent = `🎉🏆 MATCH CHAMPION: ${players[matchWinner].name} (Set score ${match.p1Sets}-${match.p2Sets}) 🏆🎉`;
         } else {
           match.currentSetIndex++;
           match.p1Games.push(0);
@@ -838,8 +838,8 @@
       p1GameScoreEl.textContent = currentScore.p1;
       p2GameScoreEl.textContent = currentScore.p2;
 
-      p1SetsEl.textContent = "게임: " + match.p1Games.join(" | ") + ` (세트: ${match.p1Sets})`;
-      p2SetsEl.textContent = "게임: " + match.p2Games.join(" | ") + ` (세트: ${match.p2Sets})`;
+      p1SetsEl.textContent = "Games: " + match.p1Games.join(" | ") + ` (Sets: ${match.p1Sets})`;
+      p2SetsEl.textContent = "Games: " + match.p2Games.join(" | ") + ` (Sets: ${match.p2Sets})`;
 
       if (match.server === 1) {
         p1Badge.classList.remove("hidden");
@@ -880,7 +880,7 @@
         stopAuto();
       } else {
         if (match.isFinished) return;
-        autoText.textContent = "정지";
+        autoText.textContent = "Stop";
         autoIcon.textContent = "⏸️";
         btnAuto.classList.remove("from-cyan-500", "to-blue-600");
         btnAuto.classList.add("from-amber-500", "to-orange-600");
@@ -899,7 +899,7 @@
         clearInterval(autoInterval);
         autoInterval = null;
       }
-      autoText.textContent = "자동 진행";
+      autoText.textContent = "Auto Play";
       autoIcon.textContent = "⏩";
       btnAuto.classList.remove("from-amber-500", "to-orange-600");
       btnAuto.classList.add("from-cyan-500", "to-blue-600");
@@ -924,8 +924,8 @@
       statusBanner.className = "hidden";
       speedBadge.classList.add("hidden");
       rallyBadge.classList.add("hidden");
-      courtActionText.textContent = "대기 중";
-      logBox.innerHTML = '<div class="text-slate-500">경기가 리셋되었습니다.</div>';
+      courtActionText.textContent = "Ready";
+      logBox.innerHTML = '<div class="text-slate-500">Match reset. Ready to play.</div>';
       updateUI();
       resizeCanvas();
     });
